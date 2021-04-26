@@ -39,6 +39,12 @@ html, body, #root, .App {
 .account {
   display: flex;
   flex-direction: row;
+  align-items: center;
+}
+.account img{
+  margin: 0 5px;
+  height: 15px;
+  width: 15px;
 }
 
 .password {

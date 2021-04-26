@@ -3,13 +3,16 @@ import {
   decryptFromKeystore as _decryptFromKeystore,
   Keystore as xchainKeystore,
 } from '@xchainjs/xchain-crypto'
+import * as bip39 from 'bip39'
 
-
-const getMasterSeedPhrase = async (
+const generateMasterSeedPhrase = async (
   masterPassword: string,
   masterKeystore: any
 ): Promise<string> => {
   return decryptFromKeystore(masterKeystore, masterPassword)
+}
+export const entropyToPhrase = (entropy: string): string => {
+  return bip39.entropyToMnemonic(entropy)
 }
 
 const hashStringValue = (string: string) => {
@@ -32,11 +35,17 @@ export class WalletDecryptor {
     this.masterSeedPhrase = masterSeedPhrase
   }
 
-  public static from = async (masterPassword: string, masterKeyStore: any) => {
-    const masterSeedPhrase = await getMasterSeedPhrase(masterPassword, masterKeyStore)
-
+  public static fromPassword = async (masterPassword: string, masterKeyStore: any) => {
+    const masterSeedPhrase = await generateMasterSeedPhrase(masterPassword, masterKeyStore)
     return new WalletDecryptor(masterSeedPhrase);
   };
+
+  public static fromRecoveryCode = async (recoveryCode: string) => {
+    const masterSeedPhrase = await entropyToPhrase(recoveryCode)
+    return new WalletDecryptor(masterSeedPhrase);
+  };
+
+  getMasterSeedPhrase = () => this.masterSeedPhrase
 
 
   getSeedPhrase = async (
