@@ -26,6 +26,10 @@ function App() {
           setMasterKeyStores(backupFileJSON.masterKey)
           const wallets = Object.values(backupFileJSON?.accounts?.wallets)
           setKeyStores(wallets.map((wallet: any) => ({ ...wallet.walletInfo.data, label: wallet.label })))
+        } else if(backupFileJSON.masterKeystore) {
+          setMasterKeyStores(backupFileJSON.masterKeystore.keystore.masterKey)
+          const wallets = Object.values(backupFileJSON?.wallets?.wallets)
+          setKeyStores(wallets.map((wallet: any) => ({ ...wallet.walletInfo.data, label: wallet.label })))
         } else {
           setMasterKeyStores(undefined)
           setKeyStores([{ ...backupFileJSON, label: 'Seed Phrase' }])
@@ -90,6 +94,7 @@ function App() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    console.log(masterKeyStore,useRecoveryCode)
     if(!masterKeyStore) {
       WalletDecryptor.fromPassword(password, keyStores[0]).then(walletDecryptor =>{
         return [{ label: keyStores[0].label, phrases: walletDecryptor.getMasterSeedPhrase() }]

@@ -36,7 +36,9 @@ export class WalletDecryptor {
   }
 
   public static fromPassword = async (masterPassword: string, masterKeyStore: any) => {
+    console.log('hehre')
     const masterSeedPhrase = await generateMasterSeedPhrase(masterPassword, masterKeyStore)
+    console.log('hehre2')
     return new WalletDecryptor(masterSeedPhrase);
   };
 
