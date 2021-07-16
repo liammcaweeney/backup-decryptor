@@ -36,9 +36,7 @@ export class WalletDecryptor {
   }
 
   public static fromPassword = async (masterPassword: string, masterKeyStore: any) => {
-    console.log('hehre')
     const masterSeedPhrase = await generateMasterSeedPhrase(masterPassword, masterKeyStore)
-    console.log('hehre2')
     return new WalletDecryptor(masterSeedPhrase);
   };
 
@@ -53,8 +51,10 @@ export class WalletDecryptor {
   getSeedPhrase = async (
     walletKeystore: any
   ): Promise<string> => {
-    const { ed25519 } = walletKeystore.publickeys
-    const pubKey = walletKeystore.publickeys.ed25519.pubKey.data || Array.from(ed25519.toBuffer())
-    return decryptFromKeystore(walletKeystore, hashStringValue(`${this.masterSeedPhrase}${pubKey.toString()}`))
+    const keyStore = walletKeystore?.keystore ? walletKeystore.keystore : walletKeystore
+    const { ed25519 } = keyStore.publickeys
+    const pubKey = ed25519.pubKey.data || Array.from(ed25519.toBuffer())
+    const password = hashStringValue(`${this.masterSeedPhrase}${pubKey.toString()}`)
+    return decryptFromKeystore(keyStore, password)
   }
 }
