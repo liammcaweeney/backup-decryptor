@@ -34,6 +34,9 @@ function App() {
           setMasterKeyStores(backupFileJSON.criticalData.masterKey)
           const wallets = Object.values(backupFileJSON?.accounts?.wallets)
           setKeyStores(wallets.map((wallet: any) => ({ ...wallet.walletInfo.data, label: wallet.label })))
+        } else if(backupFileJSON.rootKeystore) {
+          setMasterKeyStores(undefined)
+          setKeyStores([{ ...backupFileJSON.rootKeystore, label: backupFileJSON.rootLabel }])
         } else {
           setMasterKeyStores(undefined)
           setKeyStores([{ ...backupFileJSON, label: 'Seed Phrase' }])
@@ -79,7 +82,7 @@ function App() {
     }
   }
 
-  const getSeedPhraseFromWallet = (walletDecryptor: any) => {
+  const getSeedPhraseFromWallet = ( walletDecryptor: any) => {
     Promise.all(keyStores.map((keyStore: any) => {
         return walletDecryptor.getSeedPhrase(keyStore).then((phrases: any) => {
           return { label: keyStore.label, phrases }
