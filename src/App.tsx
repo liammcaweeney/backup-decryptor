@@ -2,6 +2,10 @@ import './App.css';
 import React, { useState, useRef, useEffect } from 'react'
 import { WalletDecryptor } from './utils/helpers'
 import CopyIcon from './copy.svg'
+interface Phrase {
+  label: string
+  phrase: string
+}
 
 function App() {
   const[filename, setFilename] = useState('')
@@ -83,13 +87,15 @@ function App() {
   }
 
   const getSeedPhraseFromWallet = ( walletDecryptor: any) => {
-    Promise.all(keyStores.map((keyStore: any) => {
+    Promise.allSettled<Phrase>(keyStores.map((keyStore: any) => {
         return walletDecryptor.getSeedPhrase(keyStore).then((phrases: any) => {
           return { label: keyStore.label, phrases }
         })
       })
-    ).then(phrases => {
-        setSeedPhrases(phrases)
+    ).then((promises: PromiseSettledResult<Phrase>[]) => {
+        // @ts-ignore
+      const successfullPromises = promises.filter(promise => promise.status === 'fulfilled').map((promise: PromiseFulfilledResult<Phrase>) => promise.value)
+        setSeedPhrases(successfullPromises)
         setError("")
       })
       .catch(e => {
